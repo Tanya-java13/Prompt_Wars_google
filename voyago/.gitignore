@@ -1,0 +1,5 @@
+node_modules/
+dist/
+voyago.db
+.env
+*.log
