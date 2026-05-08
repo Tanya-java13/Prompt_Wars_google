@@ -1,4 +1,11 @@
-import { VertexAI } from '@google-cloud/vertexai';
+import { GoogleGenerativeAI } from '@google/generative-ai';
+import { logger } from '../utils/logger';
+import {
+  streamItinerary,
+  streamRefinedItinerary,
+  streamExtraDay,
+} from './templateService';
+import type { Itinerary } from '../types/travel';
 
 const SYSTEM_PROMPT = `You are Voyago's expert AI travel concierge with deep knowledge of global destinations, local culture, transport, dining, and accommodation. Generate a detailed, realistic travel itinerary as valid JSON only — no markdown, no explanation, no code fences.
 Return this exact structure:
@@ -37,30 +44,59 @@ Return this exact structure:
 }
 Personalise based on: traveller type, budget tier, dietary/accessibility constraints, and selected preferences. Use real venue names, real neighbourhoods, accurate timings. Return only valid JSON.`;
 
-function getModel() {
-  const vertex = new VertexAI({
-    project: process.env.GOOGLE_CLOUD_PROJECT || 'project-warmup-2026',
-    location: 'us-central1',
-  });
-  return vertex.getGenerativeModel({
-    model: 'gemini-2.0-flash-001',
-    generationConfig: { maxOutputTokens: 4096, temperature: 0.7 },
-    systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
-  });
+function getGeminiModel() {
+  const apiKey = process.env.GOOGLE_AI_API_KEY;
+  if (!apiKey) return null;
+  try {
+    const genAI = new GoogleGenerativeAI(apiKey);
+    return genAI.getGenerativeModel({
+      model: 'gemini-2.0-flash',
+      systemInstruction: SYSTEM_PROMPT,
+      generationConfig: { maxOutputTokens: 4096, temperature: 0.7 },
+    });
+  } catch {
+    return null;
+  }
+}
+
+async function tryGeminiStream(
+  prompt: string,
+  onChunk: (chunk: string) => void,
+  onComplete: () => void,
+): Promise<boolean> {
+  const model = getGeminiModel();
+  if (!model) return false;
+  try {
+    const result = await model.generateContentStream(prompt);
+    for await (const chunk of result.stream) {
+      const text = chunk.text();
+      if (text) onChunk(text);
+    }
+    onComplete();
+    return true;
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    logger.warn('Gemini API unavailable, using template engine', { reason: msg.slice(0, 120) });
+    return false;
+  }
+}
+
+// ─── Public API ───────────────────────────────────────────────────────────────
+
+export interface ItineraryParams {
+  destination: string;
+  origin: string;
+  dates: string;
+  travellers: string;
+  budget: string;
+  preferences: string[];
+  constraints: string;
 }
 
 export async function generateItinerary(
-  params: {
-    destination: string;
-    origin: string;
-    dates: string;
-    travellers: string;
-    budget: string;
-    preferences: string[];
-    constraints: string;
-  },
+  params: ItineraryParams,
   onChunk: (chunk: string) => void,
-  onComplete: () => void
+  onComplete: () => void,
 ): Promise<void> {
   const prompt = `Plan a trip to ${params.destination} from ${params.origin}.
 Travel dates: ${params.dates}
@@ -70,22 +106,15 @@ Preferences: ${params.preferences.length > 0 ? params.preferences.join(', ') : '
 Constraints/Notes: ${params.constraints || 'None'}
 Return a complete, detailed itinerary as JSON only.`;
 
-  const result = await getModel().generateContentStream({
-    contents: [{ role: 'user', parts: [{ text: prompt }] }],
-  });
-
-  for await (const chunk of result.stream) {
-    const text = chunk.candidates?.[0]?.content?.parts?.[0]?.text ?? '';
-    if (text) onChunk(text);
-  }
-  onComplete();
+  const ok = await tryGeminiStream(prompt, onChunk, onComplete);
+  if (!ok) streamItinerary(params, onChunk, onComplete);
 }
 
 export async function refineItinerary(
-  itinerary: object,
+  itinerary: Itinerary,
   instruction: string,
   onChunk: (chunk: string) => void,
-  onComplete: () => void
+  onComplete: () => void,
 ): Promise<void> {
   const prompt = `Here is an existing travel itinerary in JSON:
 ${JSON.stringify(itinerary, null, 2)}
@@ -94,34 +123,20 @@ User instruction: "${instruction}"
 
 Apply the instruction to improve or modify this itinerary. Return the complete updated itinerary as valid JSON only, same structure as before.`;
 
-  const result = await getModel().generateContentStream({
-    contents: [{ role: 'user', parts: [{ text: prompt }] }],
-  });
-
-  for await (const chunk of result.stream) {
-    const text = chunk.candidates?.[0]?.content?.parts?.[0]?.text ?? '';
-    if (text) onChunk(text);
-  }
-  onComplete();
+  const ok = await tryGeminiStream(prompt, onChunk, onComplete);
+  if (!ok) streamRefinedItinerary(itinerary, instruction, onChunk, onComplete);
 }
 
 export async function addDayTrip(
-  itinerary: object,
+  itinerary: Itinerary,
   onChunk: (chunk: string) => void,
-  onComplete: () => void
+  onComplete: () => void,
 ): Promise<void> {
   const prompt = `Here is an existing travel itinerary in JSON:
 ${JSON.stringify(itinerary, null, 2)}
 
-Add one more day trip to this itinerary. The new day should complement existing days with a fresh theme — a nearby excursion, hidden gem, or alternative experience. Return the complete updated itinerary as valid JSON only.`;
+Add one more day trip that complements the existing days — a nearby excursion, hidden gem, or alternative experience. Return the complete updated itinerary as valid JSON only.`;
 
-  const result = await getModel().generateContentStream({
-    contents: [{ role: 'user', parts: [{ text: prompt }] }],
-  });
-
-  for await (const chunk of result.stream) {
-    const text = chunk.candidates?.[0]?.content?.parts?.[0]?.text ?? '';
-    if (text) onChunk(text);
-  }
-  onComplete();
+  const ok = await tryGeminiStream(prompt, onChunk, onComplete);
+  if (!ok) streamExtraDay(itinerary, onChunk, onComplete);
 }

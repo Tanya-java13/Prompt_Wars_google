@@ -1,117 +1,102 @@
-import { Router, Request, Response } from 'express';
+import { Router, type Request, type Response } from 'express';
 import { body, validationResult } from 'express-validator';
 import { generateItinerary, refineItinerary, addDayTrip } from '../services/claudeService';
+import { openSSE, sendChunk, sendDone, sendError } from '../utils/sse';
+import { logger } from '../utils/logger';
 
 const router = Router();
 
-const itineraryValidation = [
-  body('destination').trim().notEmpty().isLength({ max: 100 }).escape(),
-  body('origin').trim().notEmpty().isLength({ max: 100 }).escape(),
+const destinationRules = [
+  body('destination').trim().notEmpty().withMessage('Destination is required').isLength({ max: 100 }).escape(),
+  body('origin').trim().notEmpty().withMessage('Origin is required').isLength({ max: 100 }).escape(),
   body('travellers').trim().optional().isLength({ max: 50 }),
   body('budget').trim().optional().isLength({ max: 50 }),
   body('preferences').optional().isArray({ max: 10 }),
   body('constraints').optional().isLength({ max: 500 }).escape(),
 ];
 
-function sseStream(res: Response) {
-  res.setHeader('Content-Type', 'text/event-stream');
-  res.setHeader('Cache-Control', 'no-cache');
-  res.setHeader('Connection', 'keep-alive');
-  res.setHeader('X-Accel-Buffering', 'no');
-  res.flushHeaders();
-}
-
-router.post('/generate-itinerary', itineraryValidation, async (req: Request, res: Response) => {
+function validate(req: Request, res: Response): boolean {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     res.status(400).json({ errors: errors.array() });
-    return;
+    return false;
   }
+  return true;
+}
+
+router.post('/generate-itinerary', destinationRules, async (req: Request, res: Response) => {
+  if (!validate(req, res)) return;
 
   const { destination, origin, dates, travellers, budget, preferences, constraints } = req.body;
+  logger.info('Generating itinerary', { destination, origin });
 
-  sseStream(res);
-
+  openSSE(res);
   try {
     await generateItinerary(
       {
-        destination,
-        origin,
+        destination, origin,
         dates: dates || 'Flexible',
         travellers: travellers || '2 Adults',
-        budget: budget || 'Mid-range',
+        budget: budget || 'Mid-range ($150-300/day)',
         preferences: Array.isArray(preferences) ? preferences : [],
         constraints: constraints || '',
       },
-      (chunk) => res.write(`data: ${JSON.stringify({ chunk })}\n\n`),
-      () => {
-        res.write(`data: ${JSON.stringify({ done: true })}\n\n`);
-        res.end();
-      }
+      (chunk) => sendChunk(res, chunk),
+      () => sendDone(res),
     );
-  } catch (error) {
-    const message = error instanceof Error ? error.message : 'Generation failed';
-    res.write(`data: ${JSON.stringify({ error: message })}\n\n`);
-    res.end();
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'Generation failed';
+    logger.error('Itinerary generation error', { error: msg });
+    sendError(res, msg);
   }
 });
 
 router.post(
   '/refine-itinerary',
   [
-    body('itinerary').notEmpty(),
-    body('instruction').trim().notEmpty().isLength({ max: 300 }).escape(),
+    body('itinerary').notEmpty().withMessage('Itinerary is required'),
+    body('instruction').trim().notEmpty().withMessage('Instruction is required').isLength({ max: 300 }).escape(),
   ],
   async (req: Request, res: Response) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      res.status(400).json({ errors: errors.array() });
-      return;
-    }
+    if (!validate(req, res)) return;
 
-    sseStream(res);
-
+    logger.info('Refining itinerary');
+    openSSE(res);
     try {
       await refineItinerary(
         req.body.itinerary,
         req.body.instruction,
-        (chunk) => res.write(`data: ${JSON.stringify({ chunk })}\n\n`),
-        () => {
-          res.write(`data: ${JSON.stringify({ done: true })}\n\n`);
-          res.end();
-        }
+        (chunk) => sendChunk(res, chunk),
+        () => sendDone(res),
       );
-    } catch (error) {
-      const message = error instanceof Error ? error.message : 'Refinement failed';
-      res.write(`data: ${JSON.stringify({ error: message })}\n\n`);
-      res.end();
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Refinement failed';
+      logger.error('Itinerary refinement error', { error: msg });
+      sendError(res, msg);
     }
-  }
+  },
 );
 
-router.post('/add-day-trip', [body('itinerary').notEmpty()], async (req: Request, res: Response) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    res.status(400).json({ errors: errors.array() });
-    return;
-  }
+router.post(
+  '/add-day-trip',
+  [body('itinerary').notEmpty().withMessage('Itinerary is required')],
+  async (req: Request, res: Response) => {
+    if (!validate(req, res)) return;
 
-  sseStream(res);
-
-  try {
-    await addDayTrip(
-      req.body.itinerary,
-      (chunk) => res.write(`data: ${JSON.stringify({ chunk })}\n\n`),
-      () => {
-        res.write(`data: ${JSON.stringify({ done: true })}\n\n`);
-        res.end();
-      }
-    );
-  } catch (error) {
-    const message = error instanceof Error ? error.message : 'Day trip generation failed';
-    res.write(`data: ${JSON.stringify({ error: message })}\n\n`);
-    res.end();
-  }
-});
+    logger.info('Adding day trip');
+    openSSE(res);
+    try {
+      await addDayTrip(
+        req.body.itinerary,
+        (chunk) => sendChunk(res, chunk),
+        () => sendDone(res),
+      );
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Day trip generation failed';
+      logger.error('Add day trip error', { error: msg });
+      sendError(res, msg);
+    }
+  },
+);
 
 export default router;
