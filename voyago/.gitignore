@@ -3,3 +3,4 @@ dist/
 voyago.db
 .env
 *.log
+graphify-out/

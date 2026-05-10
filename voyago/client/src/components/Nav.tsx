@@ -164,7 +164,17 @@ export default function Nav() {
         onClose={() => setShowLogin(false)}
         onSuccess={() => setShowLogin(false)}
       />
-      <MyTripsDrawer isOpen={showMyTrips} onClose={() => setShowMyTrips(false)} />
+      <MyTripsDrawer
+        isOpen={showMyTrips}
+        onClose={() => setShowMyTrips(false)}
+        onReplan={(destination, origin) => {
+          setShowMyTrips(false);
+          setTimeout(() => {
+            document.getElementById('planner')?.scrollIntoView({ behavior: 'smooth' });
+            window.dispatchEvent(new CustomEvent('voyago:replan', { detail: { destination, origin } }));
+          }, 300);
+        }}
+      />
     </>
   );
 }

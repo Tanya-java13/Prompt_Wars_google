@@ -1,0 +1,691 @@
+{
+  "directed": false,
+  "multigraph": false,
+  "graph": {},
+  "nodes": [
+    {
+      "label": "MyTripsDrawer.tsx",
+      "file_type": "code",
+      "source_file": "client/src/components/MyTripsDrawer.tsx",
+      "source_location": "L1",
+      "id": "client_src_components_mytripsdrawer_tsx",
+      "community": 2,
+      "norm_label": "mytripsdrawer.tsx"
+    },
+    {
+      "label": "TripSummary",
+      "file_type": "code",
+      "source_file": "client/src/components/MyTripsDrawer.tsx",
+      "source_location": "L3",
+      "id": "components_mytripsdrawer_tripsummary",
+      "community": 2,
+      "norm_label": "tripsummary"
+    },
+    {
+      "label": "Props",
+      "file_type": "code",
+      "source_file": "client/src/components/MyTripsDrawer.tsx",
+      "source_location": "L13",
+      "id": "components_mytripsdrawer_props",
+      "community": 2,
+      "norm_label": "props"
+    },
+    {
+      "label": "MyTripsDrawer()",
+      "file_type": "code",
+      "source_file": "client/src/components/MyTripsDrawer.tsx",
+      "source_location": "L18",
+      "id": "components_mytripsdrawer_mytripsdrawer",
+      "community": 2,
+      "norm_label": "mytripsdrawer()"
+    },
+    {
+      "label": "Nav.tsx",
+      "file_type": "code",
+      "source_file": "client/src/components/Nav.tsx",
+      "source_location": "L1",
+      "id": "client_src_components_nav_tsx",
+      "community": 2,
+      "norm_label": "nav.tsx"
+    },
+    {
+      "label": "links",
+      "file_type": "code",
+      "source_file": "client/src/components/Nav.tsx",
+      "source_location": "L7",
+      "id": "components_nav_links",
+      "community": 2,
+      "norm_label": "links"
+    },
+    {
+      "label": "Nav()",
+      "file_type": "code",
+      "source_file": "client/src/components/Nav.tsx",
+      "source_location": "L14",
+      "id": "components_nav_nav",
+      "community": 2,
+      "norm_label": "nav()"
+    },
+    {
+      "label": "trips.ts",
+      "file_type": "code",
+      "source_file": "server/src/routes/trips.ts",
+      "source_location": "L1",
+      "id": "server_src_routes_trips_ts",
+      "community": 3,
+      "norm_label": "trips.ts"
+    },
+    {
+      "label": "router",
+      "file_type": "code",
+      "source_file": "server/src/routes/trips.ts",
+      "source_location": "L10",
+      "id": "routes_trips_router",
+      "community": 3,
+      "norm_label": "router"
+    },
+    {
+      "label": "saveTripRules",
+      "file_type": "code",
+      "source_file": "server/src/routes/trips.ts",
+      "source_location": "L12",
+      "id": "routes_trips_savetriprules",
+      "community": 3,
+      "norm_label": "savetriprules"
+    },
+    {
+      "label": "errors",
+      "file_type": "code",
+      "source_file": "server/src/routes/trips.ts",
+      "source_location": "L21",
+      "id": "routes_trips_errors",
+      "community": 3,
+      "norm_label": "errors"
+    },
+    {
+      "label": "id",
+      "file_type": "code",
+      "source_file": "server/src/routes/trips.ts",
+      "source_location": "L29",
+      "id": "routes_trips_id",
+      "community": 3,
+      "norm_label": "id"
+    },
+    {
+      "label": "Hero.tsx",
+      "file_type": "code",
+      "source_file": "Hero.tsx",
+      "source_location": "L1",
+      "community": 4,
+      "norm_label": "hero.tsx",
+      "id": "hero_tsx"
+    },
+    {
+      "label": "Props",
+      "file_type": "code",
+      "source_file": "Hero.tsx",
+      "source_location": "L3",
+      "community": 4,
+      "norm_label": "props",
+      "id": "components_hero_props"
+    },
+    {
+      "label": "chips",
+      "file_type": "code",
+      "source_file": "Hero.tsx",
+      "source_location": "L5",
+      "community": 4,
+      "norm_label": "chips",
+      "id": "components_hero_chips"
+    },
+    {
+      "label": "Hero()",
+      "file_type": "code",
+      "source_file": "Hero.tsx",
+      "source_location": "L7",
+      "community": 4,
+      "norm_label": "hero()",
+      "id": "components_hero_hero"
+    },
+    {
+      "label": "ItineraryPanel.tsx",
+      "file_type": "code",
+      "source_file": "ItineraryPanel.tsx",
+      "source_location": "L1",
+      "community": 1,
+      "norm_label": "itinerarypanel.tsx",
+      "id": "itinerarypanel_tsx"
+    },
+    {
+      "label": "Props",
+      "file_type": "code",
+      "source_file": "ItineraryPanel.tsx",
+      "source_location": "L4",
+      "community": 1,
+      "norm_label": "props",
+      "id": "components_itinerarypanel_props"
+    },
+    {
+      "label": "BADGE",
+      "file_type": "code",
+      "source_file": "ItineraryPanel.tsx",
+      "source_location": "L13",
+      "community": 1,
+      "norm_label": "badge",
+      "id": "components_itinerarypanel_badge"
+    },
+    {
+      "label": "ItineraryPanel()",
+      "file_type": "code",
+      "source_file": "ItineraryPanel.tsx",
+      "source_location": "L21",
+      "community": 1,
+      "norm_label": "itinerarypanel()",
+      "id": "components_itinerarypanel_itinerarypanel"
+    },
+    {
+      "label": "Nav.tsx",
+      "file_type": "code",
+      "source_file": "Nav.tsx",
+      "source_location": "L1",
+      "community": 2,
+      "norm_label": "nav.tsx",
+      "id": "nav_tsx"
+    },
+    {
+      "label": "PlannerSection.tsx",
+      "file_type": "code",
+      "source_file": "PlannerSection.tsx",
+      "source_location": "L1",
+      "community": 1,
+      "norm_label": "plannersection.tsx",
+      "id": "plannersection_tsx"
+    },
+    {
+      "label": "PREFS",
+      "file_type": "code",
+      "source_file": "PlannerSection.tsx",
+      "source_location": "L12",
+      "community": 1,
+      "norm_label": "prefs",
+      "id": "components_plannersection_prefs"
+    },
+    {
+      "label": "Props",
+      "file_type": "code",
+      "source_file": "PlannerSection.tsx",
+      "source_location": "L24",
+      "community": 1,
+      "norm_label": "props",
+      "id": "components_plannersection_props"
+    },
+    {
+      "label": "PlannerSection()",
+      "file_type": "code",
+      "source_file": "PlannerSection.tsx",
+      "source_location": "L26",
+      "community": 1,
+      "norm_label": "plannersection()",
+      "id": "components_plannersection_plannersection"
+    },
+    {
+      "label": "DestinationAutocomplete.tsx",
+      "file_type": "code",
+      "source_file": "components/DestinationAutocomplete.tsx",
+      "source_location": "L1",
+      "community": 0,
+      "norm_label": "destinationautocomplete.tsx",
+      "id": "components_destinationautocomplete_tsx"
+    },
+    {
+      "label": "Props",
+      "file_type": "code",
+      "source_file": "components/DestinationAutocomplete.tsx",
+      "source_location": "L4",
+      "community": 0,
+      "norm_label": "props",
+      "id": "components_destinationautocomplete_props"
+    },
+    {
+      "label": "DestinationAutocomplete()",
+      "file_type": "code",
+      "source_file": "components/DestinationAutocomplete.tsx",
+      "source_location": "L13",
+      "community": 0,
+      "norm_label": "destinationautocomplete()",
+      "id": "components_destinationautocomplete_destinationautocomplete"
+    },
+    {
+      "label": "destinations.ts",
+      "file_type": "code",
+      "source_file": "data/destinations.ts",
+      "source_location": "L1",
+      "community": 0,
+      "norm_label": "destinations.ts",
+      "id": "data_destinations_ts"
+    },
+    {
+      "label": "DESTINATIONS",
+      "file_type": "code",
+      "source_file": "data/destinations.ts",
+      "source_location": "L1",
+      "community": 0,
+      "norm_label": "destinations",
+      "id": "data_destinations_destinations"
+    },
+    {
+      "label": "ALIASES",
+      "file_type": "code",
+      "source_file": "data/destinations.ts",
+      "source_location": "L106",
+      "community": 0,
+      "norm_label": "aliases",
+      "id": "data_destinations_aliases"
+    },
+    {
+      "label": "POPULAR_DESTINATIONS",
+      "file_type": "code",
+      "source_file": "data/destinations.ts",
+      "source_location": "L138",
+      "community": 0,
+      "norm_label": "popular_destinations",
+      "id": "data_destinations_popular_destinations"
+    },
+    {
+      "label": "fuzzyMatch()",
+      "file_type": "code",
+      "source_file": "data/destinations.ts",
+      "source_location": "L145",
+      "community": 0,
+      "norm_label": "fuzzymatch()",
+      "id": "data_destinations_fuzzymatch"
+    },
+    {
+      "label": "searchDestinations()",
+      "file_type": "code",
+      "source_file": "data/destinations.ts",
+      "source_location": "L153",
+      "community": 0,
+      "norm_label": "searchdestinations()",
+      "id": "data_destinations_searchdestinations"
+    },
+    {
+      "label": "trips.ts",
+      "file_type": "code",
+      "source_file": "trips.ts",
+      "source_location": "L1",
+      "community": 3,
+      "norm_label": "trips.ts",
+      "id": "trips_ts"
+    }
+  ],
+  "links": [
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "client/src/components/MyTripsDrawer.tsx",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "client_src_components_mytripsdrawer_tsx",
+      "target": "components_mytripsdrawer_tripsummary",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "client/src/components/MyTripsDrawer.tsx",
+      "source_location": "L13",
+      "weight": 1.0,
+      "source": "client_src_components_mytripsdrawer_tsx",
+      "target": "components_mytripsdrawer_props",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "client/src/components/MyTripsDrawer.tsx",
+      "source_location": "L18",
+      "weight": 1.0,
+      "source": "client_src_components_mytripsdrawer_tsx",
+      "target": "components_mytripsdrawer_mytripsdrawer",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "client/src/components/Nav.tsx",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "client_src_components_nav_tsx",
+      "target": "client_src_components_mytripsdrawer_tsx",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "client/src/components/Nav.tsx",
+      "source_location": "L7",
+      "weight": 1.0,
+      "source": "client_src_components_nav_tsx",
+      "target": "components_nav_links",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "client/src/components/Nav.tsx",
+      "source_location": "L14",
+      "weight": 1.0,
+      "source": "client_src_components_nav_tsx",
+      "target": "components_nav_nav",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Nav.tsx",
+      "source_location": "L6",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "nav_tsx",
+      "target": "components_nav_links"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Nav.tsx",
+      "source_location": "L13",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "nav_tsx",
+      "target": "components_nav_nav"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "server/src/routes/trips.ts",
+      "source_location": "L10",
+      "weight": 1.0,
+      "source": "server_src_routes_trips_ts",
+      "target": "routes_trips_router",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "server/src/routes/trips.ts",
+      "source_location": "L12",
+      "weight": 1.0,
+      "source": "server_src_routes_trips_ts",
+      "target": "routes_trips_savetriprules",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "server/src/routes/trips.ts",
+      "source_location": "L81",
+      "weight": 1.0,
+      "source": "server_src_routes_trips_ts",
+      "target": "routes_trips_errors",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "server/src/routes/trips.ts",
+      "source_location": "L29",
+      "weight": 1.0,
+      "source": "server_src_routes_trips_ts",
+      "target": "routes_trips_id",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "trips.ts",
+      "source_location": "L10",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "trips_ts",
+      "target": "routes_trips_router"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "trips.ts",
+      "source_location": "L12",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "trips_ts",
+      "target": "routes_trips_savetriprules"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "trips.ts",
+      "source_location": "L58",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "trips_ts",
+      "target": "routes_trips_errors"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "trips.ts",
+      "source_location": "L29",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "trips_ts",
+      "target": "routes_trips_id"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Hero.tsx",
+      "source_location": "L3",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "hero_tsx",
+      "target": "components_hero_props"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Hero.tsx",
+      "source_location": "L5",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "hero_tsx",
+      "target": "components_hero_chips"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Hero.tsx",
+      "source_location": "L7",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "hero_tsx",
+      "target": "components_hero_hero"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "ItineraryPanel.tsx",
+      "source_location": "L4",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "itinerarypanel_tsx",
+      "target": "components_itinerarypanel_props"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "ItineraryPanel.tsx",
+      "source_location": "L13",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "itinerarypanel_tsx",
+      "target": "components_itinerarypanel_badge"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "ItineraryPanel.tsx",
+      "source_location": "L21",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "itinerarypanel_tsx",
+      "target": "components_itinerarypanel_itinerarypanel"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "PlannerSection.tsx",
+      "source_location": "L2",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "plannersection_tsx",
+      "target": "itinerarypanel_tsx"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "PlannerSection.tsx",
+      "source_location": "L12",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "plannersection_tsx",
+      "target": "components_plannersection_prefs"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "PlannerSection.tsx",
+      "source_location": "L24",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "plannersection_tsx",
+      "target": "components_plannersection_props"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "PlannerSection.tsx",
+      "source_location": "L26",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "plannersection_tsx",
+      "target": "components_plannersection_plannersection"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "components/DestinationAutocomplete.tsx",
+      "source_location": "L2",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "components_destinationautocomplete_tsx",
+      "target": "data_destinations_ts"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "components/DestinationAutocomplete.tsx",
+      "source_location": "L2",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "components_destinationautocomplete_tsx",
+      "target": "data_destinations_searchdestinations"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "components/DestinationAutocomplete.tsx",
+      "source_location": "L2",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "components_destinationautocomplete_tsx",
+      "target": "data_destinations_popular_destinations"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "components/DestinationAutocomplete.tsx",
+      "source_location": "L4",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "components_destinationautocomplete_tsx",
+      "target": "components_destinationautocomplete_props"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "components/DestinationAutocomplete.tsx",
+      "source_location": "L13",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "components_destinationautocomplete_tsx",
+      "target": "components_destinationautocomplete_destinationautocomplete"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "data/destinations.ts",
+      "source_location": "L1",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "data_destinations_ts",
+      "target": "data_destinations_destinations"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "data/destinations.ts",
+      "source_location": "L106",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "data_destinations_ts",
+      "target": "data_destinations_aliases"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "data/destinations.ts",
+      "source_location": "L138",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "data_destinations_ts",
+      "target": "data_destinations_popular_destinations"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "data/destinations.ts",
+      "source_location": "L145",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "data_destinations_ts",
+      "target": "data_destinations_fuzzymatch"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "data/destinations.ts",
+      "source_location": "L153",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "data_destinations_ts",
+      "target": "data_destinations_searchdestinations"
+    }
+  ],
+  "hyperedges": [],
+  "built_at_commit": "db5b8665bc20d5bdfb80a905c32337cc6c6313e4"
+}

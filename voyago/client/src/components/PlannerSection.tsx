@@ -43,6 +43,15 @@ export default function PlannerSection({ prefilledDestination }: Props) {
     if (prefilledDestination) setForm(p => ({ ...p, destination: prefilledDestination }));
   }, [prefilledDestination]);
 
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const { destination, origin } = (e as CustomEvent).detail;
+      setForm(p => ({ ...p, destination, origin }));
+    };
+    window.addEventListener('voyago:replan', handler);
+    return () => window.removeEventListener('voyago:replan', handler);
+  }, []);
+
   const set = (k: keyof PlannerFormData) =>
     (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) =>
       setForm(p => ({ ...p, [k]: e.target.value }));

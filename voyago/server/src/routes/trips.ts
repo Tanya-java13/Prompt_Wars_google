@@ -2,7 +2,7 @@ import { Router, type Request, type Response } from 'express';
 import { body, param, validationResult } from 'express-validator';
 import { db } from '../db';
 import { trips } from '../db/schema';
-import { eq, desc } from 'drizzle-orm';
+import { eq, desc, and } from 'drizzle-orm';
 import { v4 as uuidv4 } from 'uuid';
 import { requireAuth } from '../middleware/auth';
 import { logger } from '../utils/logger';
@@ -76,6 +76,7 @@ router.get('/trips/mine', requireAuth, async (req: Request, res: Response) => {
 
 router.get(
   '/trips/:id',
+  requireAuth,
   [param('id').isUUID().withMessage('Invalid trip ID')],
   async (req: Request, res: Response) => {
     const errors = validationResult(req);
@@ -85,7 +86,9 @@ router.get(
     }
 
     try {
-      const result = await db.select().from(trips).where(eq(trips.id, req.params.id)).limit(1);
+      const result = await db.select().from(trips)
+        .where(and(eq(trips.id, req.params.id), eq(trips.userId, req.user!.userId)))
+        .limit(1);
       if (!result.length) {
         res.status(404).json({ error: 'Trip not found' });
         return;
@@ -100,6 +103,28 @@ router.get(
       const msg = err instanceof Error ? err.message : 'Fetch failed';
       logger.error('Trip fetch error', { error: msg });
       res.status(500).json({ error: 'Could not retrieve trip — please try again.' });
+    }
+  },
+);
+
+router.delete(
+  '/trips/:id',
+  requireAuth,
+  [param('id').isUUID().withMessage('Invalid trip ID')],
+  async (req: Request, res: Response) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      res.status(400).json({ errors: errors.array() });
+      return;
+    }
+    try {
+      await db.delete(trips)
+        .where(and(eq(trips.id, req.params.id), eq(trips.userId, req.user!.userId)));
+      res.json({ success: true });
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Delete failed';
+      logger.error('Trip delete error', { error: msg });
+      res.status(500).json({ error: 'Could not delete trip.' });
     }
   },
 );
