@@ -1,3 +1,4 @@
+// logger v2
 type Severity = 'DEFAULT' | 'DEBUG' | 'INFO' | 'WARNING' | 'ERROR' | 'CRITICAL';
 
 interface LogEntry {

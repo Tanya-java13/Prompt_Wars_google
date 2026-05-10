@@ -1,7 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import ItineraryPanel from './ItineraryPanel';
 import DestinationAutocomplete from './DestinationAutocomplete';
+import LoginModal from './LoginModal';
+import PaywallModal from './PaywallModal';
+import UsageBadge from './UsageBadge';
 import { useItinerary } from '../hooks/useItinerary';
+import { useAuth } from '../contexts/AuthContext';
+import { useAnalytics } from '../hooks/useAnalytics';
 import type { PlannerFormData } from '../types/travel';
 
 const PREFS = [
@@ -20,12 +25,19 @@ interface Props { prefilledDestination: string; }
 
 export default function PlannerSection({ prefilledDestination }: Props) {
   const { itinerary, isLoading, error, generate, refine, addDay, saveTrip } = useItinerary();
+  const { isAuthenticated, canGenerate, canCustomize, refreshUser } = useAuth();
 
   const [form, setForm] = useState<PlannerFormData>({
     destination: '', origin: '', startDate: '', endDate: '',
     travellers: '2 Adults', budget: 'Mid-range ($150-300/day)',
     preferences: [], constraints: '',
   });
+
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const [showPaywallModal, setShowPaywallModal] = useState(false);
+  const [paywallTrigger, setPaywallTrigger] = useState<'generation' | 'customization'>('generation');
+  const pendingAction = useRef<(() => void) | null>(null);
+  const { trackItineraryGenerated, trackItineraryCustomized, trackPaywallShown } = useAnalytics();
 
   useEffect(() => {
     if (prefilledDestination) setForm(p => ({ ...p, destination: prefilledDestination }));
@@ -43,11 +55,70 @@ export default function PlannerSection({ prefilledDestination }: Props) {
         : [...p.preferences, id],
     }));
 
+  const doGenerate = useCallback(() => {
+    trackItineraryGenerated(form.destination, form.budget, form.travellers);
+    generate(form).then(() => refreshUser());
+  }, [form, generate, refreshUser, trackItineraryGenerated]);
+
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.destination || !form.origin) return;
-    generate(form);
+
+    if (!isAuthenticated) {
+      pendingAction.current = doGenerate;
+      setShowLoginModal(true);
+      return;
+    }
+
+    if (!canGenerate) {
+      setPaywallTrigger('generation');
+      setShowPaywallModal(true);
+      trackPaywallShown('generation');
+      return;
+    }
+
+    doGenerate();
   };
+
+  const handleLoginSuccess = () => {
+    setShowLoginModal(false);
+    if (pendingAction.current) {
+      const action = pendingAction.current;
+      pendingAction.current = null;
+      action();
+    }
+  };
+
+  const handleRefine = useCallback((instruction: string) => {
+    if (!isAuthenticated) {
+      pendingAction.current = () => refine(instruction).then(() => refreshUser());
+      setShowLoginModal(true);
+      return;
+    }
+    if (!canCustomize) {
+      setPaywallTrigger('customization');
+      setShowPaywallModal(true);
+      trackPaywallShown('customization');
+      return;
+    }
+    trackItineraryCustomized('refine');
+    refine(instruction).then(() => refreshUser());
+  }, [isAuthenticated, canCustomize, refine, refreshUser]);
+
+  const handleAddDay = useCallback(() => {
+    if (!isAuthenticated) {
+      pendingAction.current = () => addDay().then(() => refreshUser());
+      setShowLoginModal(true);
+      return;
+    }
+    if (!canCustomize) {
+      setPaywallTrigger('customization');
+      setShowPaywallModal(true);
+      return;
+    }
+    trackItineraryCustomized('add_day');
+    addDay().then(() => refreshUser());
+  }, [isAuthenticated, canCustomize, addDay, refreshUser, trackItineraryCustomized, trackPaywallShown]);
 
   return (
     <section id="planner" className="py-20 bg-cream" aria-labelledby="planner-heading">
@@ -153,17 +224,25 @@ export default function PlannerSection({ prefilledDestination }: Props) {
               <p id="constraints-hint" className="text-xs text-white/30 mt-1 font-body">{form.constraints.length}/500</p>
             </div>
 
-            <button type="submit" disabled={isLoading || !form.destination || !form.origin}
-              aria-busy={isLoading}
-              className="w-full bg-gold text-forest py-4 rounded-xl font-semibold text-sm hover:bg-gold-light transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-gold-light">
-              {isLoading ? (
-                <><div className="flex gap-1" aria-hidden="true">
-                  {[0,1,2].map(i => <span key={i} className="w-1.5 h-1.5 bg-forest rounded-full dot-bounce" style={{ animationDelay: `${i*0.18}s` }} />)}
-                </div><span>Generating…</span></>
-              ) : (
-                <><i className="ti ti-sparkles" aria-hidden="true" />Generate AI Itinerary</>
+            <div className="space-y-3">
+              <button type="submit" disabled={isLoading || !form.destination || !form.origin}
+                aria-busy={isLoading}
+                className="w-full bg-gold text-forest py-4 rounded-xl font-semibold text-sm hover:bg-gold-light transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-gold-light">
+                {isLoading ? (
+                  <><div className="flex gap-1" aria-hidden="true">
+                    {[0,1,2].map(i => <span key={i} className="w-1.5 h-1.5 bg-forest rounded-full dot-bounce" style={{ animationDelay: `${i*0.18}s` }} />)}
+                  </div><span>Generating…</span></>
+                ) : (
+                  <><i className="ti ti-sparkles" aria-hidden="true" />Generate AI Itinerary</>
+                )}
+              </button>
+
+              {isAuthenticated && (
+                <div className="flex justify-center">
+                  <UsageBadge />
+                </div>
               )}
-            </button>
+            </div>
           </form>
 
           {/* Itinerary panel */}
@@ -172,11 +251,32 @@ export default function PlannerSection({ prefilledDestination }: Props) {
             isLoading={isLoading}
             error={error}
             onSave={() => saveTrip(form)}
-            onRefine={refine}
-            onAddDay={addDay}
+            onRefine={handleRefine}
+            onAddDay={handleAddDay}
           />
         </div>
       </div>
+
+      <LoginModal
+        isOpen={showLoginModal}
+        onClose={() => { setShowLoginModal(false); pendingAction.current = null; }}
+        onSuccess={handleLoginSuccess}
+        message="Sign in with Google to generate your personalised travel itinerary."
+      />
+
+      <PaywallModal
+        isOpen={showPaywallModal}
+        onClose={() => setShowPaywallModal(false)}
+        onUpgradeSuccess={() => {
+          setShowPaywallModal(false);
+          if (pendingAction.current) {
+            const action = pendingAction.current;
+            pendingAction.current = null;
+            action();
+          }
+        }}
+        triggerType={paywallTrigger}
+      />
     </section>
   );
 }

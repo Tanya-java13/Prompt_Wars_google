@@ -10,9 +10,20 @@ async function consumeSSE(
   const response = await fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
     body: JSON.stringify(body),
   });
 
+  if (response.status === 401) {
+    throw new Error('AUTH_REQUIRED');
+  }
+  if (response.status === 403) {
+    const data = await response.json().catch(() => ({}));
+    if (data.upgradeRequired) {
+      throw new Error('UPGRADE_REQUIRED');
+    }
+    throw new Error(data.message || 'Access denied');
+  }
   if (!response.ok || !response.body) {
     throw new Error(`Server error ${response.status}`);
   }
@@ -36,7 +47,6 @@ async function consumeSSE(
       if (payload.error) { onError(payload.error); return; }
       if (payload.done) {
         try {
-          // Strip potential markdown fences from response
           const clean = json.replace(/^```json\s*/i, '').replace(/```\s*$/i, '').trim();
           onItinerary(JSON.parse(clean));
         } catch {
@@ -76,7 +86,13 @@ export function useItinerary() {
         setError
       );
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to generate itinerary');
+      if (err instanceof Error && err.message === 'AUTH_REQUIRED') {
+        setError('Please sign in to generate itineraries.');
+      } else if (err instanceof Error && err.message === 'UPGRADE_REQUIRED') {
+        setError('Free limit reached. Upgrade to Premium for unlimited access.');
+      } else {
+        setError(err instanceof Error ? err.message : 'Failed to generate itinerary');
+      }
     } finally {
       setIsLoading(false);
     }
@@ -124,6 +140,7 @@ export function useItinerary() {
       const res = await fetch('/api/trips/save', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ ...formData, itinerary }),
       });
       const data = await res.json();

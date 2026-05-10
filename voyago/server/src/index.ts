@@ -1,12 +1,17 @@
 import express, { type Request, type Response, type NextFunction } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
+import cookieParser from 'cookie-parser';
 import rateLimit from 'express-rate-limit';
 import dotenv from 'dotenv';
 import path from 'path';
 import itineraryRouter from './routes/itinerary';
 import tripsRouter from './routes/trips';
 import alertsRouter from './routes/alerts';
+import authRouter from './routes/auth';
+import subscriptionRouter from './routes/subscription';
+import statsRouter from './routes/stats';
+import { attachUser } from './middleware/auth';
 import { logger } from './utils/logger';
 
 dotenv.config({ path: path.resolve(process.cwd(), '../.env') });
@@ -22,26 +27,37 @@ app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc:    ["'self'"],
-      scriptSrc:     ["'self'"],
-      styleSrc:      ["'self'", "'unsafe-inline'"],
+      scriptSrc:     ["'self'", 'https://accounts.google.com', 'https://checkout.razorpay.com'],
+      styleSrc:      ["'self'", "'unsafe-inline'", 'https://accounts.google.com'],
       imgSrc:        ["'self'", 'data:', 'https:'],
-      connectSrc:    ["'self'"],
+      connectSrc:    ["'self'", 'https://accounts.google.com', 'https://api.razorpay.com', 'https://lumberjack-cx.razorpay.com'],
       fontSrc:       ["'self'", 'https://fonts.gstatic.com'],
+      frameSrc:      ["'self'", 'https://accounts.google.com', 'https://api.razorpay.com'],
       objectSrc:     ["'none'"],
       frameAncestors:["'none'"],
     },
   },
   crossOriginEmbedderPolicy: false,
+  crossOriginOpenerPolicy: { policy: 'same-origin-allow-popups' },
 }));
 
 app.use(cors({
   origin: isProd ? (process.env.CLIENT_URL ?? true) : 'http://localhost:5173',
   credentials: true,
   methods: ['GET', 'POST'],
-  allowedHeaders: ['Content-Type'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
 }));
 
-// ─── Rate limiting ─────────────────────────────────────────────────────────────
+// ─── Parsing ──────────────────────────────────────────────────────────────────
+
+app.use(cookieParser());
+app.use(express.json({ limit: '1mb' }));
+
+// ─── Auth ─────────────────────────────────────────────────────────────────────
+
+app.use(attachUser);
+
+// ─── Rate limiting ────────────────────────────────────────────────────────────
 
 const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -64,17 +80,18 @@ app.use('/api/generate-itinerary', generateLimiter);
 app.use('/api/refine-itinerary', generateLimiter);
 app.use('/api/add-day-trip', generateLimiter);
 
-// ─── Request logging ───────────────────────────────────────────────────────────
+// ─── Request logging ──────────────────────────────────────────────────────────
 
 app.use((req: Request, _res: Response, next: NextFunction) => {
   logger.info(`${req.method} ${req.path}`, { ip: req.ip });
   next();
 });
 
-app.use(express.json({ limit: '1mb' }));
+// ─── Routes ───────────────────────────────────────────────────────────────────
 
-// ─── Routes ────────────────────────────────────────────────────────────────────
-
+app.use('/api', authRouter);
+app.use('/api', subscriptionRouter);
+app.use('/api', statsRouter);
 app.use('/api', itineraryRouter);
 app.use('/api', tripsRouter);
 app.use('/api', alertsRouter);
@@ -98,7 +115,7 @@ app.get('/api/health', (_req, res) => {
   });
 });
 
-// ─── Global error handler ─────────────────────────────────────────────────────
+// ─── Global error handler ────────────────────────────────────────────────────
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
@@ -106,7 +123,7 @@ app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
   res.status(500).json({ error: 'Internal server error' });
 });
 
-// ─── Static files (production) ─────────────────────────────────────────────────
+// ─── Static files (production) ────────────────────────────────────────────────
 
 if (isProd) {
   const clientDist = path.resolve(__dirname, '../../client/dist');

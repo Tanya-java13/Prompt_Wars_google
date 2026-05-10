@@ -2,6 +2,8 @@ import { Router, type Request, type Response } from 'express';
 import { body, validationResult } from 'express-validator';
 import { generateItinerary, refineItinerary, addDayTrip } from '../services/claudeService';
 import { openSSE, sendChunk, sendDone, sendError } from '../utils/sse';
+import { requireAuth } from '../middleware/auth';
+import { checkGenerationLimit, checkCustomizationLimit, incrementGeneration, incrementCustomization } from '../middleware/usageLimits';
 import { logger } from '../utils/logger';
 
 const router = Router();
@@ -24,35 +26,46 @@ function validate(req: Request, res: Response): boolean {
   return true;
 }
 
-router.post('/generate-itinerary', destinationRules, async (req: Request, res: Response) => {
-  if (!validate(req, res)) return;
+router.post(
+  '/generate-itinerary',
+  requireAuth,
+  checkGenerationLimit,
+  destinationRules,
+  async (req: Request, res: Response) => {
+    if (!validate(req, res)) return;
 
-  const { destination, origin, dates, travellers, budget, preferences, constraints } = req.body;
-  logger.info('Generating itinerary', { destination, origin });
+    const { destination, origin, dates, travellers, budget, preferences, constraints } = req.body;
+    logger.info('Generating itinerary', { destination, origin, userId: req.user!.userId });
 
-  openSSE(res);
-  try {
-    await generateItinerary(
-      {
-        destination, origin,
-        dates: dates || 'Flexible',
-        travellers: travellers || '2 Adults',
-        budget: budget || 'Mid-range ($150-300/day)',
-        preferences: Array.isArray(preferences) ? preferences : [],
-        constraints: constraints || '',
-      },
-      (chunk) => sendChunk(res, chunk),
-      () => sendDone(res),
-    );
-  } catch (err) {
-    const msg = err instanceof Error ? err.message : 'Generation failed';
-    logger.error('Itinerary generation error', { error: msg });
-    sendError(res, msg);
-  }
-});
+    openSSE(res);
+    try {
+      await generateItinerary(
+        {
+          destination, origin,
+          dates: dates || 'Flexible',
+          travellers: travellers || '2 Adults',
+          budget: budget || 'Mid-range ($150-300/day)',
+          preferences: Array.isArray(preferences) ? preferences : [],
+          constraints: constraints || '',
+        },
+        (chunk) => sendChunk(res, chunk),
+        async () => {
+          sendDone(res);
+          await incrementGeneration(req.user!.userId);
+        },
+      );
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Generation failed';
+      logger.error('Itinerary generation error', { error: msg });
+      sendError(res, msg);
+    }
+  },
+);
 
 router.post(
   '/refine-itinerary',
+  requireAuth,
+  checkCustomizationLimit,
   [
     body('itinerary').notEmpty().withMessage('Itinerary is required'),
     body('instruction').trim().notEmpty().withMessage('Instruction is required').isLength({ max: 300 }).escape(),
@@ -60,14 +73,17 @@ router.post(
   async (req: Request, res: Response) => {
     if (!validate(req, res)) return;
 
-    logger.info('Refining itinerary');
+    logger.info('Refining itinerary', { userId: req.user!.userId });
     openSSE(res);
     try {
       await refineItinerary(
         req.body.itinerary,
         req.body.instruction,
         (chunk) => sendChunk(res, chunk),
-        () => sendDone(res),
+        async () => {
+          sendDone(res);
+          await incrementCustomization(req.user!.userId);
+        },
       );
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Refinement failed';
@@ -79,17 +95,22 @@ router.post(
 
 router.post(
   '/add-day-trip',
+  requireAuth,
+  checkCustomizationLimit,
   [body('itinerary').notEmpty().withMessage('Itinerary is required')],
   async (req: Request, res: Response) => {
     if (!validate(req, res)) return;
 
-    logger.info('Adding day trip');
+    logger.info('Adding day trip', { userId: req.user!.userId });
     openSSE(res);
     try {
       await addDayTrip(
         req.body.itinerary,
         (chunk) => sendChunk(res, chunk),
-        () => sendDone(res),
+        async () => {
+          sendDone(res);
+          await incrementCustomization(req.user!.userId);
+        },
       );
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Day trip generation failed';

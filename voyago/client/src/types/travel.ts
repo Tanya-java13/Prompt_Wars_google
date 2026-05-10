@@ -45,6 +45,17 @@ export interface PlannerFormData {
   constraints: string;
 }
 
+export interface AuthUser {
+  id: string;
+  email: string;
+  name: string;
+  avatarUrl: string | null;
+  generationsUsed: number;
+  customizationsUsed: number;
+  subscriptionStatus: 'free' | 'active' | 'cancelled' | 'expired';
+  subscriptionExpiresAt: string | null;
+}
+
 export interface Alert {
   id: string;
   type: 'flight' | 'weather' | 'hotel' | 'safety';
