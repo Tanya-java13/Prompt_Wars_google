@@ -28,15 +28,26 @@ export default function Nav() {
     setOpen(false);
   };
 
+  const Avatar = ({ size = 8 }: { size?: number }) => user?.avatarUrl ? (
+    <img src={user.avatarUrl} alt={user.name} className={`w-${size} h-${size} rounded-full border-2 border-gold/40`} referrerPolicy="no-referrer" />
+  ) : (
+    <div className={`w-${size} h-${size} rounded-full bg-gold/20 flex items-center justify-center`}>
+      <span className="text-gold text-xs font-semibold">{user?.name.charAt(0)}</span>
+    </div>
+  );
+
   return (
     <>
       <nav className={`fixed inset-x-0 top-0 z-50 bg-forest transition-shadow ${scrolled ? 'shadow-lg shadow-black/20' : ''}`}>
         <div className="container-main">
           <div className="flex items-center justify-between h-16">
-            <span className="font-display text-2xl font-semibold text-cream tracking-tight">
-              Voya<em className="text-gold-light italic not-italic" style={{ fontStyle: 'italic' }}>go</em>
+
+            {/* Logo */}
+            <span className="font-display text-2xl font-semibold text-cream tracking-tight shrink-0">
+              Voya<em className="text-gold-light" style={{ fontStyle: 'italic' }}>go</em>
             </span>
 
+            {/* Desktop nav links */}
             <div className="hidden md:flex items-center gap-7">
               {links.map(({ label, id }) => (
                 <button key={label} onClick={() => go(id)}
@@ -46,28 +57,18 @@ export default function Nav() {
               ))}
             </div>
 
+            {/* Desktop auth */}
             <div className="hidden md:flex items-center gap-3">
               <UsageBadge />
-
               {isAuthenticated && user ? (
                 <div className="relative">
-                  <button
-                    onClick={() => setShowDropdown(d => !d)}
+                  <button onClick={() => setShowDropdown(d => !d)}
                     className="flex items-center gap-2 hover:opacity-80 transition-opacity"
-                    aria-expanded={showDropdown}
-                    aria-haspopup="true"
-                  >
-                    {user.avatarUrl ? (
-                      <img src={user.avatarUrl} alt={user.name} className="w-8 h-8 rounded-full border-2 border-gold/40" referrerPolicy="no-referrer" />
-                    ) : (
-                      <div className="w-8 h-8 rounded-full bg-gold/20 flex items-center justify-center">
-                        <span className="text-gold text-xs font-semibold">{user.name.charAt(0)}</span>
-                      </div>
-                    )}
+                    aria-expanded={showDropdown} aria-haspopup="true">
+                    <Avatar />
                     <span className="text-cream text-sm font-body max-w-[100px] truncate">{user.name.split(' ')[0]}</span>
                     <i className="ti ti-chevron-down text-cream/50 text-xs" aria-hidden="true" />
                   </button>
-
                   {showDropdown && (
                     <>
                       <div className="fixed inset-0 z-40" onClick={() => setShowDropdown(false)} />
@@ -76,70 +77,79 @@ export default function Nav() {
                           <p className="text-sm font-semibold text-gray-700 truncate">{user.name}</p>
                           <p className="text-xs text-gray-400 truncate">{user.email}</p>
                         </div>
-                        <button
-                          onClick={() => { go('planner'); setShowDropdown(false); }}
-                          className="w-full text-left px-4 py-2 text-sm text-gray-600 hover:bg-sand transition-colors font-body flex items-center gap-2"
-                        >
-                          <i className="ti ti-map text-gray-400 text-sm" aria-hidden="true" />My Trips
+                        <button onClick={() => { go('planner'); setShowDropdown(false); }}
+                          className="w-full text-left px-4 py-2 text-sm text-gray-600 hover:bg-sand transition-colors font-body flex items-center gap-2">
+                          <i className="ti ti-map text-gray-400 text-sm" />My Trips
                         </button>
-                        <button
-                          onClick={() => { logout(); setShowDropdown(false); }}
-                          className="w-full text-left px-4 py-2 text-sm text-coral hover:bg-coral/5 transition-colors font-body flex items-center gap-2"
-                        >
-                          <i className="ti ti-logout text-coral text-sm" aria-hidden="true" />Sign Out
+                        <button onClick={() => { logout(); setShowDropdown(false); }}
+                          className="w-full text-left px-4 py-2 text-sm text-coral hover:bg-coral/5 transition-colors font-body flex items-center gap-2">
+                          <i className="ti ti-logout text-coral text-sm" />Sign Out
                         </button>
                       </div>
                     </>
                   )}
                 </div>
               ) : (
-                <button
-                  onClick={() => setShowLogin(true)}
-                  className="bg-gold text-forest text-sm font-semibold px-5 py-2 rounded-full hover:bg-gold-light transition-colors flex items-center gap-1.5"
-                >
-                  <i className="ti ti-brand-google text-sm" aria-hidden="true" />Sign In
+                <button onClick={() => setShowLogin(true)}
+                  className="bg-gold text-forest text-sm font-semibold px-5 py-2 rounded-full hover:bg-gold-light transition-colors flex items-center gap-1.5">
+                  <i className="ti ti-brand-google text-sm" />Sign In
                 </button>
               )}
             </div>
 
-            <button className="md:hidden text-cream text-xl" onClick={() => setOpen(o => !o)}
-              aria-label={open ? 'Close menu' : 'Open menu'}>
-              <i className={`ti ti-${open ? 'x' : 'menu-2'}`} />
-            </button>
+            {/* Mobile: always-visible auth + hamburger */}
+            <div className="flex items-center gap-2 md:hidden">
+              {isAuthenticated && user ? (
+                <button onClick={() => setOpen(o => !o)} className="flex items-center gap-2" aria-label="Open menu">
+                  <Avatar size={8} />
+                  <span className="text-cream text-sm font-body max-w-[80px] truncate">{user.name.split(' ')[0]}</span>
+                </button>
+              ) : (
+                <button onClick={() => setShowLogin(true)}
+                  className="bg-gold text-forest text-xs font-semibold px-4 py-2 rounded-full flex items-center gap-1.5">
+                  <i className="ti ti-brand-google text-xs" />Sign In
+                </button>
+              )}
+              <button className="text-cream text-xl p-1" onClick={() => setOpen(o => !o)}
+                aria-label={open ? 'Close menu' : 'Open menu'}>
+                <i className={`ti ti-${open ? 'x' : 'menu-2'}`} />
+              </button>
+            </div>
           </div>
 
+          {/* Mobile drawer */}
           {open && (
-            <div className="md:hidden border-t border-white/10 py-4 flex flex-col gap-3">
+            <div className="md:hidden border-t border-white/10 py-4 flex flex-col gap-1 pb-6">
               {links.map(({ label, id }) => (
                 <button key={label} onClick={() => go(id)}
-                  className="text-left text-cream/75 hover:text-gold-light text-sm py-1 font-body">
+                  className="text-left text-cream/75 hover:text-gold-light text-sm py-2.5 px-1 font-body border-b border-white/5 last:border-0">
                   {label}
                 </button>
               ))}
+
               {isAuthenticated && user ? (
-                <>
-                  <div className="flex items-center gap-2 py-2 border-t border-white/10 mt-1">
-                    {user.avatarUrl ? (
-                      <img src={user.avatarUrl} alt={user.name} className="w-6 h-6 rounded-full" referrerPolicy="no-referrer" />
-                    ) : (
-                      <div className="w-6 h-6 rounded-full bg-gold/20 flex items-center justify-center">
-                        <span className="text-gold text-xs font-semibold">{user.name.charAt(0)}</span>
-                      </div>
-                    )}
-                    <span className="text-cream text-sm font-body">{user.name}</span>
-                    <UsageBadge />
+                <div className="mt-3 pt-3 border-t border-white/10 space-y-1">
+                  <div className="flex items-center gap-3 py-2">
+                    <Avatar size={9} />
+                    <div className="min-w-0">
+                      <p className="text-cream text-sm font-semibold truncate">{user.name}</p>
+                      <p className="text-cream/50 text-xs truncate">{user.email}</p>
+                    </div>
                   </div>
-                  <button onClick={() => { logout(); setOpen(false); }}
-                    className="text-left text-coral/80 text-sm py-1 font-body">
-                    Sign Out
+                  <div className="py-1"><UsageBadge /></div>
+                  <button onClick={() => { go('planner'); setOpen(false); }}
+                    className="w-full text-left text-cream/70 text-sm py-2.5 font-body flex items-center gap-2 hover:text-gold-light transition-colors">
+                    <i className="ti ti-map text-sm" />My Trips
                   </button>
-                </>
+                  <button onClick={() => { logout(); setOpen(false); }}
+                    className="w-full text-left text-coral/80 text-sm py-2.5 font-body flex items-center gap-2">
+                    <i className="ti ti-logout text-sm" />Sign Out
+                  </button>
+                </div>
               ) : (
-                <button
-                  onClick={() => { setShowLogin(true); setOpen(false); }}
-                  className="mt-1 w-fit bg-gold text-forest text-sm font-semibold px-5 py-2 rounded-full flex items-center gap-1.5"
-                >
-                  <i className="ti ti-brand-google text-sm" aria-hidden="true" />Sign In
+                <button onClick={() => { setShowLogin(true); setOpen(false); }}
+                  className="mt-3 w-fit bg-gold text-forest text-sm font-semibold px-5 py-2.5 rounded-full flex items-center gap-1.5">
+                  <i className="ti ti-brand-google text-sm" />Sign In with Google
                 </button>
               )}
             </div>

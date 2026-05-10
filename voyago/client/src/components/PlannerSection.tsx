@@ -135,8 +135,8 @@ export default function PlannerSection({ prefilledDestination }: Props) {
 
         <div className="grid md:grid-cols-2 gap-8 items-start">
           {/* Form */}
-          <form onSubmit={submit} className="bg-forest rounded-2xl p-8 space-y-5" noValidate aria-label="Trip planning form">
-            <div className="grid grid-cols-2 gap-4">
+          <form onSubmit={submit} className="bg-forest rounded-2xl p-5 sm:p-8 space-y-5" noValidate aria-label="Trip planning form">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label htmlFor="destination" className={labelCls}>Destination</label>
                 <DestinationAutocomplete
@@ -197,7 +197,7 @@ export default function PlannerSection({ prefilledDestination }: Props) {
 
             <fieldset>
               <legend className={labelCls}>Preferences</legend>
-              <div className="grid grid-cols-3 gap-2" role="group" aria-label="Travel preferences">
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2" role="group" aria-label="Travel preferences">
                 {PREFS.map(({ id, icon, label }) => (
                   <button key={id} type="button" onClick={() => togglePref(id)}
                     aria-pressed={form.preferences.includes(id)}

@@ -38,7 +38,7 @@ export default function ItineraryPanel({ itinerary, isLoading, error, onSave, on
 
   if (isLoading) {
     return (
-      <div className="bg-white rounded-2xl border border-mist shadow-sm p-12 flex flex-col items-center justify-center min-h-[520px]" role="status" aria-label="Generating itinerary">
+      <div className="bg-white rounded-2xl border border-mist shadow-sm p-8 flex flex-col items-center justify-center min-h-[320px] sm:min-h-[520px]" role="status" aria-label="Generating itinerary">
         <div className="flex gap-2 mb-5" aria-hidden="true">
           {[0,1,2].map(i => <span key={i} className="w-3 h-3 bg-gold rounded-full dot-bounce" style={{ animationDelay: `${i*0.18}s` }} />)}
         </div>
@@ -50,7 +50,7 @@ export default function ItineraryPanel({ itinerary, isLoading, error, onSave, on
 
   if (error) {
     return (
-      <div className="bg-white rounded-2xl border border-coral/30 shadow-sm p-12 flex flex-col items-center justify-center min-h-[520px]" role="alert">
+      <div className="bg-white rounded-2xl border border-coral/30 shadow-sm p-8 flex flex-col items-center justify-center min-h-[320px] sm:min-h-[520px]" role="alert">
         <i className="ti ti-alert-circle text-coral text-4xl mb-4" aria-hidden="true" />
         <p className="text-gray-700 font-semibold text-sm mb-2">Generation failed</p>
         <p className="text-gray-400 text-xs text-center font-body max-w-xs">{error}</p>
@@ -60,7 +60,7 @@ export default function ItineraryPanel({ itinerary, isLoading, error, onSave, on
 
   if (!itinerary) {
     return (
-      <div className="bg-white rounded-2xl border border-mist shadow-sm p-12 flex flex-col items-center justify-center min-h-[520px]" aria-label="Itinerary placeholder">
+      <div className="bg-white rounded-2xl border border-mist shadow-sm p-8 flex flex-col items-center justify-center min-h-[320px] sm:min-h-[520px]" aria-label="Itinerary placeholder">
         <div className="w-16 h-16 rounded-full bg-sand flex items-center justify-center mb-6" aria-hidden="true">
           <i className="ti ti-map-2 text-gold text-2xl" />
         </div>
