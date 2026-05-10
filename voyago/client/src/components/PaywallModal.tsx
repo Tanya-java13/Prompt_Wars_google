@@ -10,6 +10,17 @@ interface Props {
 
 const RAZORPAY_KEY_ID = import.meta.env.VITE_RAZORPAY_KEY_ID as string;
 
+function loadRazorpayScript(): Promise<void> {
+  return new Promise((resolve, reject) => {
+    if (typeof Razorpay !== 'undefined') { resolve(); return; }
+    const script = document.createElement('script');
+    script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+    script.onload = () => resolve();
+    script.onerror = () => reject(new Error('Failed to load Razorpay'));
+    document.head.appendChild(script);
+  });
+}
+
 export default function PaywallModal({ isOpen, onClose, onUpgradeSuccess, triggerType }: Props) {
   const { user, refreshUser } = useAuth();
   const [loading, setLoading] = useState(false);
@@ -20,6 +31,8 @@ export default function PaywallModal({ isOpen, onClose, onUpgradeSuccess, trigge
     setError(null);
 
     try {
+      await loadRazorpayScript();
+
       const res = await fetch('/api/subscribe/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
