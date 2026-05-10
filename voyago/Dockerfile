@@ -17,6 +17,14 @@ RUN npm install
 COPY client/ ./client/
 COPY server/ ./server/
 
+# Vite env vars must be present at build time (they get inlined into the JS bundle)
+ARG VITE_GOOGLE_CLIENT_ID
+ARG VITE_RAZORPAY_KEY_ID
+ARG VITE_GA_MEASUREMENT_ID
+ENV VITE_GOOGLE_CLIENT_ID=$VITE_GOOGLE_CLIENT_ID
+ENV VITE_RAZORPAY_KEY_ID=$VITE_RAZORPAY_KEY_ID
+ENV VITE_GA_MEASUREMENT_ID=$VITE_GA_MEASUREMENT_ID
+
 # Build React client
 RUN npm run build --workspace=client
 
