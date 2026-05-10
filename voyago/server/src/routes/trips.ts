@@ -4,6 +4,7 @@ import { db } from '../db';
 import { trips } from '../db/schema';
 import { eq } from 'drizzle-orm';
 import { v4 as uuidv4 } from 'uuid';
+import { requireAuth } from '../middleware/auth';
 import { logger } from '../utils/logger';
 
 const router = Router();
@@ -16,7 +17,7 @@ const saveTripRules = [
   body('itinerary').notEmpty().withMessage('Itinerary data is required'),
 ];
 
-router.post('/trips/save', saveTripRules, async (req: Request, res: Response) => {
+router.post('/trips/save', requireAuth, saveTripRules, async (req: Request, res: Response) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     res.status(400).json({ errors: errors.array() });
@@ -29,6 +30,7 @@ router.post('/trips/save', saveTripRules, async (req: Request, res: Response) =>
 
     await db.insert(trips).values({
       id,
+      userId: req.user!.userId,
       destination,
       origin,
       dates: dates ?? 'Flexible',
