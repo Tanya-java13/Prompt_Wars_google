@@ -319,10 +319,11 @@ export default function MyTripsDrawer({ isOpen, onClose, onReplan }: Props) {
             <button
               onClick={() => deleteTrip(selected.id)}
               disabled={deleting}
-              className="flex items-center justify-center px-3 py-2.5 rounded-xl text-sm text-coral hover:bg-coral/5 border border-coral/20 transition-colors disabled:opacity-50"
+              className="flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl text-sm font-body text-coral hover:bg-coral/5 border border-coral/20 transition-colors disabled:opacity-50"
               title="Delete trip"
             >
               <i className="ti ti-trash" />
+              <span>{deleting ? '…' : 'Delete'}</span>
             </button>
           </div>
         )}
