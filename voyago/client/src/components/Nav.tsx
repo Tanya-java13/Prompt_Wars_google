@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import UsageBadge from './UsageBadge';
 import LoginModal from './LoginModal';
+import MyTripsDrawer from './MyTripsDrawer';
 
 const links = [
   { label: 'Discover', id: 'destinations' },
@@ -16,6 +17,7 @@ export default function Nav() {
   const [open, setOpen] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
+  const [showMyTrips, setShowMyTrips] = useState(false);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 10);
@@ -77,7 +79,7 @@ export default function Nav() {
                           <p className="text-sm font-semibold text-gray-700 truncate">{user.name}</p>
                           <p className="text-xs text-gray-400 truncate">{user.email}</p>
                         </div>
-                        <button onClick={() => { go('planner'); setShowDropdown(false); }}
+                        <button onClick={() => { setShowMyTrips(true); setShowDropdown(false); }}
                           className="w-full text-left px-4 py-2 text-sm text-gray-600 hover:bg-sand transition-colors font-body flex items-center gap-2">
                           <i className="ti ti-map text-gray-400 text-sm" />My Trips
                         </button>
@@ -137,7 +139,7 @@ export default function Nav() {
                     </div>
                   </div>
                   <div className="py-1"><UsageBadge /></div>
-                  <button onClick={() => { go('planner'); setOpen(false); }}
+                  <button onClick={() => { setShowMyTrips(true); setOpen(false); }}
                     className="w-full text-left text-cream/70 text-sm py-2.5 font-body flex items-center gap-2 hover:text-gold-light transition-colors">
                     <i className="ti ti-map text-sm" />My Trips
                   </button>
@@ -162,6 +164,7 @@ export default function Nav() {
         onClose={() => setShowLogin(false)}
         onSuccess={() => setShowLogin(false)}
       />
+      <MyTripsDrawer isOpen={showMyTrips} onClose={() => setShowMyTrips(false)} />
     </>
   );
 }

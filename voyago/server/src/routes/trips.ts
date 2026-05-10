@@ -2,7 +2,7 @@ import { Router, type Request, type Response } from 'express';
 import { body, param, validationResult } from 'express-validator';
 import { db } from '../db';
 import { trips } from '../db/schema';
-import { eq } from 'drizzle-orm';
+import { eq, desc } from 'drizzle-orm';
 import { v4 as uuidv4 } from 'uuid';
 import { requireAuth } from '../middleware/auth';
 import { logger } from '../utils/logger';
@@ -48,6 +48,29 @@ router.post('/trips/save', requireAuth, saveTripRules, async (req: Request, res:
     const msg = err instanceof Error ? err.message : 'Save failed';
     logger.error('Trip save error', { error: msg });
     res.status(500).json({ error: 'Could not save trip — please try again.' });
+  }
+});
+
+router.get('/trips/mine', requireAuth, async (req: Request, res: Response) => {
+  try {
+    const results = await db.select({
+      id: trips.id,
+      destination: trips.destination,
+      origin: trips.origin,
+      dates: trips.dates,
+      travellers: trips.travellers,
+      budget: trips.budget,
+      createdAt: trips.createdAt,
+    }).from(trips)
+      .where(eq(trips.userId, req.user!.userId))
+      .orderBy(desc(trips.createdAt))
+      .limit(20);
+
+    res.json({ trips: results });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'Fetch failed';
+    logger.error('My trips error', { error: msg });
+    res.status(500).json({ error: 'Could not fetch trips.' });
   }
 });
 
