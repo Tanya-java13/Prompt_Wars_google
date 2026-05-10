@@ -1,7 +1,7 @@
 import { Router, type Request, type Response } from 'express';
 import { db } from '../db';
 import { trips, users } from '../db/schema';
-import { sql, desc } from 'drizzle-orm';
+import { sql, desc, gte } from 'drizzle-orm';
 
 const router = Router();
 
@@ -20,7 +20,7 @@ router.get('/stats', async (_req: Request, res: Response) => {
     const [todayCount] = await db
       .select({ count: sql<number>`count(*)` })
       .from(trips)
-      .where(sql`created_at >= ${today.getTime()}`);
+      .where(gte(trips.createdAt, today));
 
     const topDestinations = await db
       .select({

@@ -13,6 +13,7 @@ import subscriptionRouter from './routes/subscription';
 import statsRouter from './routes/stats';
 import { attachUser } from './middleware/auth';
 import { logger } from './utils/logger';
+import { runMigrations } from './db';
 
 dotenv.config({ path: path.resolve(process.cwd(), '../.env') });
 dotenv.config({ path: path.resolve(process.cwd(), '.env') });
@@ -131,6 +132,13 @@ if (isProd) {
   app.get('*', (_req, res) => res.sendFile(path.join(clientDist, 'index.html')));
 }
 
-app.listen(PORT, () => {
-  logger.info('Voyago server started', { port: PORT, env: process.env.NODE_ENV ?? 'development' });
-});
+runMigrations()
+  .then(() => {
+    app.listen(PORT, () => {
+      logger.info('Voyago server started', { port: PORT, env: process.env.NODE_ENV ?? 'development' });
+    });
+  })
+  .catch((err) => {
+    logger.error('DB migration failed, aborting startup', { error: (err as Error).message });
+    process.exit(1);
+  });

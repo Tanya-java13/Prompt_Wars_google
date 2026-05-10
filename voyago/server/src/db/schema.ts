@@ -1,6 +1,6 @@
-import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core';
+import { pgTable, text, integer, timestamp } from 'drizzle-orm/pg-core';
 
-export const users = sqliteTable('users', {
+export const users = pgTable('users', {
   id: text('id').primaryKey(),
   googleId: text('google_id').notNull().unique(),
   email: text('email').notNull(),
@@ -9,14 +9,14 @@ export const users = sqliteTable('users', {
   generationsUsed: integer('generations_used').notNull().default(0),
   customizationsUsed: integer('customizations_used').notNull().default(0),
   subscriptionStatus: text('subscription_status').notNull().default('free'),
-  subscriptionExpiresAt: integer('subscription_expires_at', { mode: 'timestamp' }),
+  subscriptionExpiresAt: timestamp('subscription_expires_at'),
   razorpaySubscriptionId: text('razorpay_subscription_id'),
   razorpayCustomerId: text('razorpay_customer_id'),
-  createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
-  updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull(),
+  createdAt: timestamp('created_at').notNull(),
+  updatedAt: timestamp('updated_at').notNull(),
 });
 
-export const trips = sqliteTable('trips', {
+export const trips = pgTable('trips', {
   id: text('id').primaryKey(),
   userId: text('user_id'),
   destination: text('destination').notNull(),
@@ -27,5 +27,5 @@ export const trips = sqliteTable('trips', {
   preferences: text('preferences').notNull(),
   constraints: text('constraints'),
   itinerary: text('itinerary').notNull(),
-  createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
+  createdAt: timestamp('created_at').notNull(),
 });
