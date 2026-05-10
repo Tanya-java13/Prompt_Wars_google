@@ -1,0 +1,21 @@
+steps:
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - build
+      - '--build-arg'
+      - 'VITE_GOOGLE_CLIENT_ID=${_VITE_GOOGLE_CLIENT_ID}'
+      - '--build-arg'
+      - 'VITE_RAZORPAY_KEY_ID=${_VITE_RAZORPAY_KEY_ID}'
+      - '--build-arg'
+      - 'VITE_GA_MEASUREMENT_ID=${_VITE_GA_MEASUREMENT_ID}'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/voyago'
+      - '.'
+
+images:
+  - 'gcr.io/$PROJECT_ID/voyago'
+
+substitutions:
+  _VITE_GOOGLE_CLIENT_ID: ''
+  _VITE_RAZORPAY_KEY_ID: ''
+  _VITE_GA_MEASUREMENT_ID: ''
